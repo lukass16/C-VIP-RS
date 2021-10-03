@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include "gps_rswrapper.h"
 #include "lcd_rswrapper.h"
-#include "lora_rswrapper.h"
-#include <ArduinoJson.h>
+#include <LoRa.h>
+#include <SPI.h>
+#include <lcd_rswrapper.h>
+#include <lora_rswrapper.h>
 
-String jsonString;
-StaticJsonDocument<256> document;
 
 //defining receivable sensor variables
 double lat = 0;
@@ -21,12 +21,51 @@ float pres = 0;
 float bar_alt = 0;
 float speed = 0;
 
+//Packet stuff
+
 int counter = 0;
+int badPackets = 0;
+int corruptedPackets = 0;
+double successRate = 0;
+float receivedRSSI = 0;
+float receivedSNR = 0;
+int receivedSize = 0;
+int mathCounter = 0;
+bool startCorruption = 0;
+long freqError= 0;
+
+//ScreenSwitching related variables
+int LeftSwitch = 25;
+int RightSwitch = 26;
+short LeftState = 0;
+short RightState = 0;
+int prevLeftState = 0;
+int prevRightState = 0;
+bool buttonPressed = 0;
+
+//Screen update logic
+int currentScreen = 1;
+int prevSats = -1;
+int pageCounter = 1;
+int prevDisplayedCounter = 0;
+int MathCounter = 0; //EXP
+bool ScreenSwitched = 0;
 
 //defining necessary functional variables
+double prevDistance = 0;
 double distance = 0;
 double course = 0;
+double sats = 0;
 bool gpsValid = 0;
+
+//defining deserialization function
+void deserializeData(char buffer[]){
+  sscanf(buffer, "%lf,%lf,%lf,%f,%f,%f,%f,%f,%f,%d", &lat, &lng, &alt, &magx, &magy, &magz, &temp, &pres, &bar_alt, &counter); //for deserialization double ahs to vbe specified as %lf
+}
+
+//defining message string and deserialization buffer
+String message = "";
+char buffer[80] = "";
 
 void setup()
 {
@@ -45,18 +84,69 @@ void setup()
   //LCD
   Serial.println("Setup LCD");
   lcd::setup();
+
+  //Slēdži
+  pinMode(LeftSwitch, INPUT);
+  pinMode(RightSwitch, INPUT);
+
 }
 
 void loop()
 {
-  //TODO - atkariba no packet counter var ieviest vai ko mainam lcd - proti ja nav jauna pakete nekas nenotiek jauns
-  //loop tiek lasits LoRa
-  jsonString = lora::onReceive(lora::getPacketSize());
-  if (jsonString != "NULL")
+  //GPS nolasīšanas/barošanas funkcija
+  
+  gps::readGps();
+
+  
+  //RSSI update
+  receivedRSSI = lora::getPacketRssi();
+  receivedSNR = lora::getPacketSNR();
+  /*receivedSize = lora::getPacketSize(); 
+              88              
+              ""              
+                              
+    8b,dPPYba, 88 8b,dPPYba,   
+    88P'   "Y8 88 88P'    "8a  
+    88         88 88       d8  3 days of my time and my sanity right here
+    88         88 88b,   ,a8"  
+    88         88 88`YbbdP"'   
+                  88           
+                  88       
+  */
+  freqError = lora::freqError();
+  
+  
+  //Slēdžu nolasīšana
+  LeftState = digitalRead(LeftSwitch);
+  RightState = digitalRead(RightSwitch);
+
+  
+  //BUTTON LOGIC
+  if(LeftState == 1 && prevLeftState == 0 && pageCounter <=1)
   {
-    deserializeJson(document, jsonString);
+    pageCounter++;
+    prevLeftState = 1;
+    buttonPressed = 1;
   }
 
+  if(RightState == 1 && prevRightState == 0 && pageCounter >= 1)
+  {
+    pageCounter = pageCounter-1;
+    prevRightState = 1;
+    buttonPressed = 1;
+  }
+
+  buttonPressed = 0;
+  prevLeftState = digitalRead(LeftSwitch);
+  prevRightState = digitalRead(RightSwitch);
+  
+  //loop tiek lasits LoRa
+
+  message = lora::readMessage();
+  message.toCharArray(buffer, 80);
+  deserializeData(buffer);
+
+  /*
   //GPS
   lat = document["lat"];
   lng = document["lng"];
@@ -76,31 +166,70 @@ void loop()
   // COUNTER
   counter = document["counter"];
 
+  */
 
-  //*FUNKCIJAS
-  //- Gps heading
-  course = gps::getCourseTo(lat, lng);
-  //- Gps distance
-  distance = gps::getDistance(lat, lng);
-  //- Target coord
-  Serial.print("lat: ");
-  Serial.println(lat);
-  Serial.print("lng: ");
-  Serial.println(lng);
-  //- Mes esam pieslegusies - pasam RS ?isValid()
+  //RS GPS aprēķini un funkcijas
+  if(lat != 0 && lng != 0)
+  {
+    distance = gps::getDistance(lat, lng);
+    course = gps::getCourseTo(lat, lng);
+  }
+  sats = gps::getSatellites();
   gpsValid = gps::gpsValid();
-  //- augstums (var pieslegt funkciju parslegties no gps un barometra augstumu)
-  Serial.print("Barometer altitude: ");
-  Serial.println(bar_alt);
-  Serial.print("GPS altitude: ");
-  Serial.println(alt);
-  //- vertical speed
-  //TODO add vertical speed to C VIP ROCKET code
-
   
-  
-  //TODO - test lcd dispalying capability
-  lcd::writeAll(lat, lng, distance, course, alt, speed, gpsValid, counter);
 
-  //? lapas-pogas
+//SLIKTO PAKEŠU APRĒĶINS
+//Ja divu secīgu pakešu atšķirība ir lielāka par viens, aprēķina izkritušo paketi
+//Ja pienāk nulles pakete pēc tā, ka ir saņemta pakete lielāka par 0, tā tiek uztverta kā koruptēta
+
+  if(MathCounter != counter)
+  {
+    if(counter>=1)
+    {
+    badPackets = badPackets + (counter-(MathCounter+1));
+    successRate = 100-((int)((double)badPackets/counter*100));   
+    MathCounter = counter;
+    Serial.print("New packet, badPackets = ");
+    Serial.print(badPackets);
+    Serial.print(" success ratio = ");
+    Serial.println(successRate);
+    }
+  }
+  if(counter==0 && MathCounter >= 1 && startCorruption == 1)
+    {
+      corruptedPackets++;
+      startCorruption = 0;
+    }
+
+//Ja pg counter == 2 un ekrāns pārslēgts vai mainās distance vai pienāk jauna pakete, tad atsvaidzina
+//Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
+//Ja pg counter == 0 un ekrāns pārslēgts vai mainās pakešu skaits, tad atsvaidzina
+
+  if(pageCounter == 2 && (currentScreen != 2 || prevDisplayedCounter !=  counter || prevDistance != distance))
+  {
+        if(counter>=1)
+        {
+        lcd::writeAll(lat, lng, distance, course, bar_alt, speed, gpsValid, counter);
+        prevDisplayedCounter = counter;
+        prevDistance = distance;
+        currentScreen = 2;
+        }
+    } 
+      else if(pageCounter == 1 && (currentScreen != 1 || prevSats != sats))
+      {
+        lcd::GPSSetup(sats);
+        prevSats = sats;
+        currentScreen = 1;
+      }
+      else if(pageCounter == 0 && (currentScreen != 0 || prevDisplayedCounter != counter))
+        {
+          lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR, corruptedPackets);
+          prevDisplayedCounter = counter;
+          currentScreen = 0;
+        }
+        
+        
 }
+
+  
+
