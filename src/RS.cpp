@@ -1,10 +1,13 @@
 #include <Arduino.h>
+#include <cstdio>
 #include "gps_rswrapper.h"
 #include "lcd_rswrapper.h"
 #include "lora_rswrapper.h"
 #include <ArduinoJson.h>
 
-String jsonString;
+using namespace std;
+
+String incoming;
 StaticJsonDocument<256> document;
 
 //defining receivable sensor variables
@@ -27,6 +30,11 @@ int counter = 0;
 double distance = 0;
 double course = 0;
 bool gpsValid = 0;
+
+void deserializeData(String ser){
+  char buffer[100];
+  sscanf(buffer, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%d", &lat, &lng, &alt, &magx, &magy, &magz, &temp, &pres, &bar_alt, &counter);
+}
 
 void setup()
 {
@@ -55,10 +63,12 @@ void loop()
 {
   //TODO - atkariba no packet counter var ieviest vai ko mainam lcd - proti ja nav jauna pakete nekas nenotiek jauns
   //loop tiek lasits LoRa
-  jsonString = lora::onReceive(lora::getPacketSize());
-  if (jsonString != "NULL")
+  //jsonString = lora::onReceive(lora::getPacketSize());
+  incoming = lora::readMessage();
+
+  if (incoming != "NULL")
   {
-    deserializeJson(document, jsonString);
+    deserializeData(incoming);
   }
 
   //GPS
