@@ -22,6 +22,8 @@ float pres = 0;
 float bar_alt = 0;
 float vert_velocity = 0;
 
+int bat_status = 0;
+
 //Packet stuff
 
 int counter = 0;
@@ -61,7 +63,7 @@ bool gpsValid = 0;
 
 //defining deserialization function
 void deserializeData(char buffer[]){
-  sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%d", &lat, &lng, &alt, &sats_r, &magx, &magy, &magz, &temp, &bar_alt, &vert_velocity, &counter); //for deserialization double ahs to vbe specified as %lf
+  sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%d,%d", &lat, &lng, &alt, &sats_r, &magx, &magy, &magz, &temp, &bar_alt, &vert_velocity, &bat_status, &counter); //for deserialization double ahs to vbe specified as %lf
 }
 
 //defining message string and deserialization buffer
