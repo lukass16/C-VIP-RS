@@ -11,6 +11,7 @@
 double lat = 0;
 double lng = 0;
 double alt = 0;
+int sats_r = 0;
 
 float magx = 0;
 float magy = 0;
@@ -19,7 +20,7 @@ float magz = 0;
 float temp = 0;
 float pres = 0;
 float bar_alt = 0;
-float speed = 0;
+float vert_velocity = 0;
 
 //Packet stuff
 
@@ -60,7 +61,7 @@ bool gpsValid = 0;
 
 //defining deserialization function
 void deserializeData(char buffer[]){
-  sscanf(buffer, "%lf,%lf,%lf,%f,%f,%f,%f,%f,%f,%d", &lat, &lng, &alt, &magx, &magy, &magz, &temp, &pres, &bar_alt, &counter); //for deserialization double ahs to vbe specified as %lf
+  sscanf(buffer, "%lf,%lf,%lf,%d,%f,%f,%f,%f,%f,%f,%d", &lat, &lng, &alt, &sats_r, &magx, &magy, &magz, &temp, &bar_alt, &vert_velocity, &counter); //for deserialization double ahs to vbe specified as %lf
 }
 
 //defining message string and deserialization buffer
@@ -209,7 +210,7 @@ void loop()
   {
         if(counter>=1)
         {
-        lcd::writeAll(lat, lng, distance, course, bar_alt, speed, gpsValid, counter);
+        lcd::writeAll(lat, lng, distance, course, bar_alt, vert_velocity, gpsValid, counter);
         prevDisplayedCounter = counter;
         prevDistance = distance;
         currentScreen = 2;
