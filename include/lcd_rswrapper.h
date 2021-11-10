@@ -6,7 +6,16 @@
 
 //https://github.com/johnrickman/LiquidCrystal_I2C
 //https://docs.google.com/document/d/1Fbtc8zCtQmf6O5GGj64akNSewvqAAdK0V5oWDq2YLxc/edit
-
+//
+    /*
+     __         __
+/  \.-"""-./  \
+\    -   -    /
+ |   o   o   |
+ \  .-'''-.  /
+  '-\__Y__/-'
+     `---`
+    */
 
 namespace lcd {
 
