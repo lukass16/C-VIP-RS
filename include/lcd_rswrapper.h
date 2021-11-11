@@ -128,7 +128,7 @@ namespace lcd {
         lcd.print(sats);
     }
     
-    void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR, int corruptedPackets)
+    void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR)
     {   int droppedPackets = 0;
         lcd.clear();
         lcd.setCursor(0,0);
@@ -139,9 +139,9 @@ namespace lcd {
 
         lcd.setCursor(0,1);
         lcd.print("CRPT:"); 
-        lcd.print(corruptedPackets);
+        //lcd.print(corruptedPackets);
         lcd.print("    DROP:");
-        droppedPackets = badPackets-corruptedPackets;
+        //droppedPackets = badPackets-corruptedPackets;
         lcd.print(droppedPackets);
 
         lcd.setCursor(0,2);
