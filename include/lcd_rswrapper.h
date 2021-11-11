@@ -6,16 +6,6 @@
 
 //https://github.com/johnrickman/LiquidCrystal_I2C
 //https://docs.google.com/document/d/1Fbtc8zCtQmf6O5GGj64akNSewvqAAdK0V5oWDq2YLxc/edit
-//
-    /*
-     __         __
-/  \.-"""-./  \
-\    -   -    /
- |   o   o   |
- \  .-'''-.  /
-  '-\__Y__/-'
-     `---`
-    */
 
 namespace lcd {
 
@@ -27,7 +17,6 @@ namespace lcd {
         lcd.backlight();
         lcd.setCursor(1, 0); //Pirmais skaitlis ir kolonna, otrais skatilis ir rinda
         lcd.print("Press <> to begin"); 
-      
     }
 
     void writeLat(double lat)
@@ -35,7 +24,8 @@ namespace lcd {
         lcd.setCursor(0, 0);
         lcd.print("Lat:");
         lcd.setCursor(4, 0);
-        if(lat!=0){
+        if(lat!=0)
+        {
         lcd.print(lat, 4);
         } else {
         lcd.print("NL");           
@@ -47,7 +37,8 @@ namespace lcd {
         lcd.setCursor(0, 1);
         lcd.print("Lon:");
         lcd.setCursor(4, 1);
-        if(lon!=0){
+        if(lon!=0)
+        {
         lcd.print(lon, 4);
         } else {
         lcd.print("NL");           
@@ -77,7 +68,7 @@ namespace lcd {
         lcd.setCursor(11, 2);
         lcd.print("Alt:");
         lcd.setCursor(15, 2);
-        lcd.print(bar_alt, 0); //Using barometric altitude rather than GPS
+        lcd.print(bar_alt, 0);
         lcd.setCursor(19, 2);  
         lcd.print("m");
     }
@@ -127,7 +118,8 @@ namespace lcd {
     }
     
     void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR, String freqErrorConverted)
-    {   int droppedPackets = 0;
+    {   
+        int droppedPackets = 0;
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("RCVD:");
@@ -168,7 +160,7 @@ namespace lcd {
         writeSpeed(spd);
         writeGpsRsats(sats_r);
         writeCounter(counter);
-        }
+    }
 
 }
 

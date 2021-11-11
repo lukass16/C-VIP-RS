@@ -32,7 +32,7 @@ namespace gps {
     }
 
     double lastLatitude() {
-        return gps.location.lat();  //TODO ar 6 skaitljiem?
+        return gps.location.lat(); 
     }
 
     double lastLongitude() {
@@ -42,8 +42,6 @@ namespace gps {
     double lastAltitude() {
         return gps.altitude.meters();
     }
-
-    //*NEW
 
     int getSatellites()
     {
