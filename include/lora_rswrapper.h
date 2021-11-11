@@ -60,11 +60,7 @@ namespace lora {
         Serial.println("Lora connected");
         Serial.println(LoRa.available());
     }
-/* pain
-    void readMessage() {
-        onReceive(LoRa.parsePacket()); 
-    }
-*/
+
     long freqError()
     {
         return LoRa.packetFrequencyError();

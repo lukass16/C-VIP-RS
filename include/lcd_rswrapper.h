@@ -106,7 +106,7 @@ namespace lcd {
         lcd.print(counter);
     }
 
-    void GPSSetup(int sats)
+    void GPSSetup(int sats, int sats_r)
     {
         lcd.clear();
         if(sats <= 3)
@@ -118,8 +118,12 @@ namespace lcd {
             lcd.print("3D Lock Established");
         }
         lcd.setCursor(0,1);
-        lcd.print("Sats visible: ");
+        lcd.print("RS Sats visible: ");
         lcd.print(sats);
+        
+        lcd.setCursor(0,2);
+        lcd.print("FC Sats visible: ");
+        lcd.print(sats_r);
     }
     
     void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR, String freqErrorConverted)

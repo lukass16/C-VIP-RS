@@ -185,7 +185,7 @@ void loop()
     } 
       else if(pageCounter == 1 && (currentScreen != 1 || prevSats != sats))
       {
-        lcd::GPSSetup(sats);
+        lcd::GPSSetup(sats, sats_r);
         prevSats = sats;
         currentScreen = 1;
       }
