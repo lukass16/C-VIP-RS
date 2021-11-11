@@ -149,28 +149,6 @@ void loop()
   message.toCharArray(buffer, 80);
   deserializeData(buffer);
 
-  /*
-  //GPS
-  lat = document["lat"];
-  lng = document["lng"];
-  alt = document["alt"];
-
-  // MAGNETOMETER
-  magx = document["x"];
-  magy = document["y"];
-  magz = document["z"];
-
-  // BAROMETER
-  temp = document["temp"];
-  pres = document["pres"];
-  bar_alt = document["bar_alt"];
-  speed = document["vert_vel"];
-
-  // COUNTER
-  counter = document["counter"];
-
-  */
-
   //RS GPS aprēķini un funkcijas
   if(lat != 0 && lng != 0)
   {
