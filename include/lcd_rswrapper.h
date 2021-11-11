@@ -60,7 +60,7 @@ namespace lcd {
         lcd.print("Dist:");
         lcd.setCursor(5, 2);
         lcd.print(dist, 0);
-        lcd.setCursor(8, 2);  //pieņemu, ka distace < 1000m
+        lcd.setCursor(9, 2);  
         lcd.print("m");
     }
 
@@ -89,20 +89,6 @@ namespace lcd {
         lcd.print(sats_r);
     }
 
-    /*
-    void writeGpsStatus(bool status)
-    {
-        lcd.setCursor(19, 1);
-        if(status)
-        {
-            lcd.print("*");
-        }
-        else
-        {
-            lcd.print("O");
-        }
-    }
-    */
     void writeSpeed(float spd)
     {
         lcd.setCursor(10, 3);
@@ -120,7 +106,6 @@ namespace lcd {
         lcd.print(counter);
     }
 
-//GPS Prep wrapperis
     void GPSSetup(int sats)
     {
         lcd.clear();
