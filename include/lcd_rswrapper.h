@@ -82,9 +82,17 @@ namespace lcd {
         lcd.print("m");
     }
 
+    void writeGpsRsats(int sats_r)
+    {
+        lcd.setCursor(13, 1);
+        lcd.print("S:");
+        lcd.print(sats_r);
+    }
+
+    /*
     void writeGpsStatus(bool status)
     {
-        lcd.setCursor(19, 0);
+        lcd.setCursor(19, 1);
         if(status)
         {
             lcd.print("*");
@@ -94,20 +102,21 @@ namespace lcd {
             lcd.print("O");
         }
     }
-
+    */
     void writeSpeed(float spd)
     {
-        lcd.setCursor(11, 3);
-        lcd.print("SPD:");
-        lcd.setCursor(15, 3);
-        lcd.print(spd, 1);
+        lcd.setCursor(10, 3);
+        lcd.print("SPD:");        
+        lcd.print(spd, 0);
+        lcd.setCursor(17, 3);
+        lcd.print("m/s");
     }
 
     void writeCounter(int counter)
     {
-        lcd.setCursor(12, 0);
+        lcd.setCursor(13, 0);
         lcd.print("C:");
-        lcd.setCursor(14, 0);
+        lcd.setCursor(15, 0);
         lcd.print(counter);
     }
 
@@ -128,21 +137,22 @@ namespace lcd {
         lcd.print(sats);
     }
     
-    void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR)
+    void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR, String freqErrorConverted)
     {   int droppedPackets = 0;
         lcd.clear();
         lcd.setCursor(0,0);
-        lcd.print("Received:");
+        lcd.print("RCVD:");
         lcd.print(MathCounter-badPackets);
         lcd.print("/");
         lcd.print(MathCounter);
 
         lcd.setCursor(0,1);
-        lcd.print("CRPT:"); 
-        //lcd.print(corruptedPackets);
-        lcd.print("    DROP:");
-        //droppedPackets = badPackets-corruptedPackets;
+        lcd.print("DROP:");
         lcd.print(droppedPackets);
+
+        lcd.setCursor(9, 1);
+        lcd.print("FRQ:");
+        lcd.print(freqErrorConverted);
 
         lcd.setCursor(0,2);
         lcd.print("SNR:");
@@ -158,7 +168,7 @@ namespace lcd {
 
     }
 
-    void writeAll(double lat, double lon, double dist, double course, double alt, float spd, bool status, int counter)
+    void writeAll(double lat, double lon, double dist, double course, double alt, float spd, int sats_r, int counter)
     {
         lcd.clear();
         writeLat(lat);
@@ -167,7 +177,7 @@ namespace lcd {
         writeHeading(course);
         writeAltitude(alt);
         writeSpeed(spd);
-        writeGpsStatus(status);
+        writeGpsRsats(sats_r);
         writeCounter(counter);
         }
 

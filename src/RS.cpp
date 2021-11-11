@@ -33,7 +33,8 @@ float receivedRSSI = 0;
 float receivedSNR = 0;
 int receivedSize = 0;
 int mathCounter = 0;
-long freqError= 0;
+long freqErrorRaw= 0;
+String freqErrorConverted = "";
 
 //ScreenSwitching related variables
 int LeftSwitch = 25;
@@ -102,7 +103,12 @@ void loop()
   //RSSI update
   receivedRSSI = lora::getPacketRssi();
   receivedSNR = lora::getPacketSNR();
-  freqError = lora::freqError();
+
+  char bufferO [10];
+  freqErrorRaw = lora::freqError();
+  double freqErrorDouble = freqErrorRaw;
+  sprintf(bufferO, "%.1e", freqErrorDouble);
+  freqErrorConverted = bufferO;
   
   
   //Slēdžu nolasīšana
@@ -171,7 +177,7 @@ void loop()
   {
         if(counter>=1)
         {
-        lcd::writeAll(lat, lng, distance, course, bar_alt, vert_velocity, gpsValid, counter);
+        lcd::writeAll(lat, lng, distance, course, bar_alt, vert_velocity, sats_r, counter);
         prevDisplayedCounter = counter;
         prevDistance = distance;
         currentScreen = 2;
@@ -185,7 +191,7 @@ void loop()
       }
       else if(pageCounter == 0 && (currentScreen != 0 || prevDisplayedCounter != counter))
         {
-          lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR);
+          lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR, freqErrorConverted);
           prevDisplayedCounter = counter;
           currentScreen = 0;
         }
