@@ -28,13 +28,11 @@ int bat_status = 0;
 
 int counter = 0;
 int badPackets = 0;
-int corruptedPackets = 0;
 double successRate = 0;
 float receivedRSSI = 0;
 float receivedSNR = 0;
 int receivedSize = 0;
 int mathCounter = 0;
-bool startCorruption = 0;
 long freqError= 0;
 
 //ScreenSwitching related variables
@@ -104,18 +102,6 @@ void loop()
   //RSSI update
   receivedRSSI = lora::getPacketRssi();
   receivedSNR = lora::getPacketSNR();
-  /*receivedSize = lora::getPacketSize(); 
-              88              
-              ""              
-                              
-    8b,dPPYba, 88 8b,dPPYba,   
-    88P'   "Y8 88 88P'    "8a  
-    88         88 88       d8  3 days of my time and my sanity right here
-    88         88 88b,   ,a8"  
-    88         88 88`YbbdP"'   
-                  88           
-                  88       
-  */
   freqError = lora::freqError();
   
   
@@ -176,11 +162,6 @@ void loop()
     Serial.println(successRate);
     }
   }
-  if(counter==0 && MathCounter >= 1 && startCorruption == 1)
-    {
-      corruptedPackets++;
-      startCorruption = 0;
-    }
 
 //Ja pg counter == 2 un ekrāns pārslēgts vai mainās distance vai pienāk jauna pakete, tad atsvaidzina
 //Ja pg counter == 1 un ekrāns pārslēgts vai mainās satelītu skaits, tad atsvaidzina
@@ -204,7 +185,7 @@ void loop()
       }
       else if(pageCounter == 0 && (currentScreen != 0 || prevDisplayedCounter != counter))
         {
-          lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR, corruptedPackets);
+          lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR);
           prevDisplayedCounter = counter;
           currentScreen = 0;
         }
