@@ -27,9 +27,7 @@ namespace lcd {
         if(lat!=0)
         {
         lcd.print(lat, 4);
-        } else {
-        lcd.print("NL");           
-        }
+        } 
     }
 
     void writeLon(double lon)
@@ -40,9 +38,7 @@ namespace lcd {
         if(lon!=0)
         {
         lcd.print(lon, 4);
-        } else {
-        lcd.print("NL");           
-        }
+        } 
     }
 
     void writeDistance(double dist)
