@@ -191,7 +191,7 @@ void loop()
       }
       else if(pageCounter == 0 && (currentScreen != 0 || prevDisplayedCounter != counter))
         {
-          lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR, freqErrorConverted);
+          lcd::LoRaSetup(MathCounter, badPackets, successRate, receivedRSSI, receivedSNR, freqErrorConverted, bat_status);
           prevDisplayedCounter = counter;
           currentScreen = 0;
         }

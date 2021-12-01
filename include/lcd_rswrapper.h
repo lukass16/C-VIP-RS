@@ -113,7 +113,7 @@ namespace lcd {
         lcd.print(sats_r);
     }
     
-    void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR, String freqErrorConverted)
+    void LoRaSetup(int MathCounter, int badPackets, double successRate, float receivedRSSI, float receivedSNR, String freqErrorConverted, int bat_status)
     {   
         int droppedPackets = 0;
         lcd.clear();
@@ -142,6 +142,8 @@ namespace lcd {
         lcd.print("RSSI:");
         lcd.print(receivedRSSI, 0);
         lcd.print("dBm");
+        lcd.print(" BAT:");
+        lcd.print(bat_status);
 
     }
 
